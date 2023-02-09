@@ -32,12 +32,12 @@ public:
     Optional(const Optional& other)
         : data_(),
           is_initialized_(other.is_initialized_ ? true : false),
-          value_ptr_(other.is_initialized_ ? new(&data_[0]) T(other.value_ptr_) : nullptr) {}
+          value_ptr_(other.is_initialized_ ? new(&data_[0]) T(other.Value()) : nullptr) {}
 
     Optional(Optional&& other)
         : data_(),
           is_initialized_(other.is_initialized_ ? true : false),
-          value_ptr_(other.is_initialized_ ? new(&data_[0]) T(std::move(other.value_ptr_)) : nullptr) {}
+          value_ptr_(other.is_initialized_ ? new(&data_[0]) T(std::move(other.Value())) : nullptr) {}
 
     Optional& operator=(const T& value) {
         if (is_initialized_) {
@@ -92,9 +92,7 @@ public:
     }
 
     ~Optional() {
-        if (is_initialized_) {
-            value_ptr_->~T();
-        }
+        Reset();
     }
 
     bool HasValue() const {
@@ -144,9 +142,8 @@ public:
 private:
     // alignas нужен для правильного выравнивания блока памяти
     alignas(T) char data_[sizeof(T)];
-    T* value_ptr_ = nullptr;
     bool is_initialized_ = false;
-
+    T* value_ptr_ = nullptr;
 };
 
 
