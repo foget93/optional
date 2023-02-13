@@ -7,4 +7,5 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    optional.h
+    optional.h \
+    tests.h

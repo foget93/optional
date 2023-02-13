@@ -1,5 +1,9 @@
+#pragma once
+
 #include <stdexcept>
 #include <utility>
+#include <memory>
+#include <string>
 
 /*
 Чтобы вовремя обнаружить ошибки работы с сырой памятью,
@@ -93,6 +97,15 @@ public:
 
     ~Optional() {
         Reset();
+    }
+
+    template <typename... Args>
+    void Emplace(Args&&... values) {
+        if (is_initialized_) {
+            this->Reset();
+        }
+        value_ptr_ = new(&data_[0]) T(std::forward<Args>(values)...);//тяжко
+        is_initialized_ = true;
     }
 
     bool HasValue() const {
