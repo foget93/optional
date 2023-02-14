@@ -114,12 +114,19 @@ public:
 
     // Операторы * и -> не должны делать никаких проверок на пустоту Optional.
     // Эти проверки остаются на совести программиста
-    T& operator*() {
+    // Метод вызывается у объектов, доступных по обычной lvalue-ссылке
+    T& operator*()& {
         return *value_ptr_;
     }
 
-    const T& operator*() const {
+    // Метод вызывается у объектов, доступных по обычной lvalue-ссылке --- &
+    const T& operator*() const& {
         return *value_ptr_;
+    }
+
+    // Метод вызывается у объектов, доступных по обычной rvalue-ссылке
+    T&& operator*() && {
+        return std::move(*value_ptr_);
     }
 
     T* operator->() {
@@ -130,19 +137,29 @@ public:
         return value_ptr_;
     }
 
+    // Метод вызывается у объектов, доступных по обычной lvalue-ссылке --- &
     // Метод Value() генерирует исключение BadOptionalAccess, если Optional пуст
-    T& Value() {
+    T& Value()& {
         if(!is_initialized_) {
             throw BadOptionalAccess();
         }
         return *value_ptr_;
     }
 
-    const T& Value() const {
+    // Метод вызывается у объектов, доступных по обычной lvalue-ссылке --- &
+    const T& Value() const& {
         if(!is_initialized_) {
             throw BadOptionalAccess();
         }
         return *value_ptr_;
+    }
+
+    // Метод вызывается у объектов, доступных по обычной rvalue-ссылке
+    T&& Value()&&  {
+        if(!is_initialized_) {
+            throw BadOptionalAccess();
+        }
+        return std::move(*value_ptr_);
     }
 
     void Reset() {
